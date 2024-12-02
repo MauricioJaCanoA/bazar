@@ -1,22 +1,31 @@
-import logo from './logo.svg';
 import './App.css';
+import Navbar from './components/navbar';
+import Producto from './components/productos';
+import Almacen from './components/almacen';
+
 
 function App() {
+  let component;
+
+  switch(window.location.pathname){
+    default:
+      <Producto/>
+      break;
+    case '/':
+      component = <Producto/>
+      break;
+    case '/Productos':
+      component = <Producto/>
+      break;
+    case '/Almacen':
+      component = <Almacen/>
+      break;
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navbar/>
+      {component}
     </div>
   );
 }
