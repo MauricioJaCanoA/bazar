@@ -22,7 +22,7 @@ function Producto() {
     }, []);
 
     return(
-        <div className="d-flex flex-wrap gap-2 m-4 justify-content-around"> 
+        <div className="d-flex flex-wrap m-4 justify-content-center"> 
             {productos.map((producto) => {
                 return(
                     <Card key={producto.id} id={producto.id} nombre={producto.nombre_producto} precio={producto.precio_producto} imagen={'data:image/png;base64,'+producto.image}/>

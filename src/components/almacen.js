@@ -7,15 +7,15 @@ import "../utils/css/almacen.css"
 function Almacen() {
     const [showModal,setShowModal] = useState(false)
     const [productos,setProductos] = useState([]);
-    const[nombre_producto,setnombre_producto] = useState('');
-    const[precio_producto,setprecio_producto] = useState('');
-    const[envio_producto,setenvio_producto] = useState('');
-    const[margen_ganancia,setmargen_ganancia] = useState('');
+    const[nombre_producto,setNombreProducto] = useState('');
+    const[precio_producto,setPrecioProducto] = useState('');
+    const[envio_producto,setEnvioProducto] = useState('');
+    const[margen_ganancia,setMargenGanancia] = useState('');
     const[costo_producto,setCostoProducto] = useState('');
 
 
     const getProductos = async () => {
-        const { data: items, error } = await supabase.from('Producto').select('*');
+        const { data: items, error } = await supabase.from('Producto').select('*').order('nombre_producto',{ascending: true});
         if(error){
             console.error(error);
         } else {
@@ -58,8 +58,52 @@ function Almacen() {
     }
 
     const handleOnBlur = () => {
-        let costoTotal = costo_producto + envio_producto; 
-        setprecio_producto((costoTotal*margen_ganancia)+(costoTotal));
+        console.log(costo_producto)
+        console.log(envio_producto)
+        let costoTotal = Number(costo_producto) + Number(envio_producto);
+        console.log(costoTotal)
+        console.log(margen_ganancia) 
+        setPrecioProducto((costoTotal*margen_ganancia)+(costoTotal));
+    }
+
+    const handleBlurUpdate = async (e,campo,producto) => {
+        let costoTotal = 0;
+        let update = {};
+        update[campo] = e.target.innerHTML;
+
+        switch(campo){
+            case 'costo_producto':
+                costoTotal = Number(e.target.innerHTML) + producto.envio_producto;
+                update.precio_producto = (costoTotal*producto.margen_ganancia)+(costoTotal); 
+                break;
+            case 'envio_producto':
+                costoTotal =  producto.costo_producto + Number(e.target.innerHTML);
+                update.precio_producto = (costoTotal*producto.margen_ganancia)+(costoTotal); 
+                break;
+            case 'margen_ganancia':
+                costoTotal = producto.costo_producto + producto.envio_producto;
+                update.precio_producto = (costoTotal*Number(e.target.innerHTML))+(costoTotal); 
+                break; 
+        }
+        console.log(costoTotal)
+        console.log(update)
+
+        const { error } = await supabase.from('Producto').update(update).eq('id', producto.id);
+        if (error) {
+            console.error('update error: ', error);
+        } else {
+            getProductos();
+        }
+
+    }
+
+    const handleClickDelete = async (id) => {
+        const { error} = await supabase.from('Producto').delete().eq('id',id);
+        if(error){
+            console.error(error);
+        }else{
+            getProductos()
+        }
     }
 
     return(
@@ -86,13 +130,13 @@ function Almacen() {
                     {productos.map((producto) => {
                         return (
                             <tr key={producto.id}>                            
-                                <td contentEditable="true" >{producto.nombre_producto}</td>
-                                <td>${producto.costo_producto}</td>
-                                <td>${producto.envio_producto}</td>                                
-                                <td>{(producto.margen_ganancia)*100}%</td>                                
-                                <td>${producto.precio_producto.toFixed(2)}</td>
+                                <td onBlur={(e) => handleBlurUpdate(e,'nombre_producto',producto)} contentEditable="true" suppressContentEditableWarning="true">{producto.nombre_producto}</td>
+                                <td onBlur={(e) => handleBlurUpdate(e,'costo_producto',producto)} contentEditable="true" suppressContentEditableWarning="true">{producto.costo_producto}</td>
+                                <td onBlur={(e) => handleBlurUpdate(e,'envio_producto',producto)} contentEditable="true" suppressContentEditableWarning="true">{producto.envio_producto}</td>                                
+                                <td onBlur={(e) => handleBlurUpdate(e,'margen_ganancia',producto)} contentEditable="true" suppressContentEditableWarning="true">{producto.margen_ganancia}</td>                                
+                                <td onBlur={(e) => handleBlurUpdate(e,'precio_producto',producto)} contentEditable="true" suppressContentEditableWarning="true">{producto.precio_producto.toFixed(2)}</td>
                                 <td>
-                                    <button className="btn-bc d-flex gap-1 align-items-center">
+                                    <button onClick={() => handleClickDelete(producto.id)} className="btn-bc d-flex gap-1 align-items-center">
                                         <FontAwesomeIcon icon={faTrash} size="1x" color="white" />
                                         Eliminar
                                     </button>
@@ -113,7 +157,7 @@ function Almacen() {
                             <div className="modal-body">
                                 <div className="input-group mb-3">
                                     <label className="w-25 btn-bc" htmlFor="nombre_producto">Nombre</label>
-                                    <input className="form-control" onChange={(e) => {setnombre_producto(e.target.value); console.log(e.target.value)}} type="text" placeholder="Nombre Producto" id="nombre_producto" required/>
+                                    <input className="form-control" onChange={(e) => {setNombreProducto(e.target.value); console.log(e.target.value)}} type="text" placeholder="Nombre Producto" id="nombre_producto" required/>
                                 </div>
                                 <div className="input-group mb-3">
                                     <label className="w-25 btn-bc" htmlFor="costo_producto">Costo</label>
@@ -121,15 +165,15 @@ function Almacen() {
                                 </div>
                                 <div className="input-group mb-3">
                                     <label className="w-25 btn-bc" htmlFor="envio_producto">Envio</label>
-                                    <input className="form-control" onChange={(e) => setenvio_producto(e.target.value)} value={envio_producto} type="number" placeholder="Envio Producto" id="envio_producto" required/>
+                                    <input className="form-control" onChange={(e) => setEnvioProducto(e.target.value)} value={envio_producto} type="number" placeholder="Envio Producto" id="envio_producto" required/>
                                 </div>
                                 <div className="input-group mb-3">
                                     <label className="w-25 btn-bc" htmlFor="margen_ganancia">Margen</label>
-                                    <input className="form-control" onChange={(e) => setmargen_ganancia(e.target.value)} value={margen_ganancia} onBlur={() => handleOnBlur()} type="number" placeholder="Margen Ganancia" id="margen_ganancia" required/>
+                                    <input className="form-control" onChange={(e) => setMargenGanancia(e.target.value)} value={margen_ganancia} onBlur={() => handleOnBlur()} type="number" placeholder="Margen Ganancia" id="margen_ganancia" required/>
                                 </div>                                
                                 <div className="input-group mb-3">
                                     <label className="w-25 btn-bc" htmlFor="precio_producto">Precio</label>
-                                    <input className="form-control" onChange={(e) => setprecio_producto(e.target.value)} value={precio_producto} type="number" placeholder="Precio Producto" id="precio_producto" required/>
+                                    <input className="form-control" onChange={(e) => setPrecioProducto(e.target.value)} value={precio_producto} type="number" placeholder="Precio Producto" id="precio_producto" required/>
                                 </div>
                             </div>
                             <div className="modal-footer">
