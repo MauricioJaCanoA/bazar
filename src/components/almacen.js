@@ -86,11 +86,11 @@ function Almacen() {
                     {productos.map((producto) => {
                         return (
                             <tr key={producto.id}>                            
-                                <td>{producto.nombre_producto}</td>
+                                <td contentEditable="true" >{producto.nombre_producto}</td>
                                 <td>${producto.costo_producto}</td>
                                 <td>${producto.envio_producto}</td>                                
-                                <td>{producto.margen_ganacia}</td>                                
-                                <td>${producto.precio_producto}</td>
+                                <td>{(producto.margen_ganancia)*100}%</td>                                
+                                <td>${producto.precio_producto.toFixed(2)}</td>
                                 <td>
                                     <button className="btn-bc d-flex gap-1 align-items-center">
                                         <FontAwesomeIcon icon={faTrash} size="1x" color="white" />
