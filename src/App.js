@@ -2,6 +2,7 @@ import './App.css';
 import Navbar from './components/navbar';
 import Producto from './components/productos';
 import Almacen from './components/almacen';
+import ShoppingCart from './components/shoppingCart';
 
 
 function App() {
@@ -19,6 +20,9 @@ function App() {
       break;
     case '/Almacen':
       component = <Almacen/>
+      break;  
+    case '/Carrito':
+      component = <ShoppingCart/>
       break;
   }
 

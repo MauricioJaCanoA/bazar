@@ -4,7 +4,6 @@ import { faCartShopping, faUser } from '@fortawesome/free-solid-svg-icons';
 import "../utils/css/navbar.css";
 
 function Navbar() {
-
     return (
         <nav className="navbar navbar-expand-lg nb-bc" >
             <div className="container-fluid">
@@ -28,9 +27,9 @@ function Navbar() {
                     <div className="d-flex gap-5 me-3">
                         <a className="nav-link active position-relative" href="/Carrito">
                             <FontAwesomeIcon icon={faCartShopping} size="2x" color="white" />
-                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary"> <span className="visually-hidden">unread messages</span></span>
+                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-secondary">{sessionStorage.getItem('cantidad_productos_SC')}<span className="visually-hidden">unread messages</span></span>
                         </a>
-                        <a className="nav-link active" href="/Carrito">
+                        <a className="nav-link active" href="/">
                             <FontAwesomeIcon icon={faUser} size="2x" color="white" />
                         </a>
                     </div>
